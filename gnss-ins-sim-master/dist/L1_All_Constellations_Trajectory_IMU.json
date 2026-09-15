@@ -1,0 +1,138 @@
+{
+  "version": 1.0,
+  "description": "L1 multi-constellation IF data generation: GPS L1CA, Galileo E1, BDS B1I/B1C, GLONASS G1",
+  "time": {
+    "type": "UTC",
+    "year": 2021,
+    "month": 6,
+    "day": 19,
+    "hour": 10,
+    "minute": 5,
+    "second": 30
+  },
+  "trajectory": {
+    "name": "test scenario",
+    "initPosition": {
+      "type": "LLA",
+      "format": "d",
+      "longitude": -121.915773,
+      "latitude": 37.352721,
+      "altitude": 20
+    },
+    "initVelocity": {
+      "type": "SCU",
+      "speed": 0,
+      "course": 0
+    },
+    "trajectoryList": [
+      {
+        "type": "Const",
+        "time": 300
+      },
+      {
+        "type": "ConstAcc",
+        "speed": 5,
+        "acceleration": 1
+      },
+      {
+        "type": "Const",
+        "time": 5
+      },
+      {
+        "type": "Jerk",
+        "time": 3,
+        "acceleration": 3
+      },
+      {
+        "type": "ConstAcc",
+        "time": 20,
+        "acceleration": 3
+      },
+      {
+        "type": "Jerk",
+        "time": 6,
+        "acceleration": 0
+      },
+      {
+        "type": "VerticalAcc",
+        "speed": 20,
+        "acceleration": 2
+      },
+      {
+        "type": "Const",
+        "time": 100
+      },
+      {
+        "type": "VerticalAcc",
+        "speed": 0,
+        "acceleration": 1
+      },
+      {
+        "type": "Const",
+        "time": 30
+      },
+      {
+        "type": "HorizontalTurn",
+        "acceleration": 2,
+        "angle": 225
+      },
+      {
+        "type": "Const",
+        "time": 200
+      }
+    ]
+  },
+  "ephemeris": {
+    "type": "RINEX",
+    "name": "../EphData/BRDC00IGS_R_20211700000_01D_MN.rnx"
+  },
+  "output": {
+    "type": "observation",
+    "format": "RINEX",
+    "name": "test2.o",
+    "interval": 1,
+    "config": {
+      "elevationMask": 3
+    },
+    "systemSelect": [
+      {
+        "system": "GPS",
+        "signal": "L1CA",
+        "enable": true
+      },
+      {
+        "system": "GPS",
+        "signal": "L1C",
+        "enable": false
+      },
+      {
+        "system": "BDS",
+        "signal": "B1C",
+        "enable": true
+      },
+      {
+        "system": "BDS",
+        "signal": "B1I",
+        "enable": true
+      },
+      {
+        "system": "Galileo",
+        "signal": "E1",
+        "enable": true
+      },
+      {
+        "system": "GLONASS",
+        "signal": "G1",
+        "enable": true
+      }
+    ]
+  },
+  "power": {
+    "noiseFloor": -172,
+    "initPower": {
+      "unit": "dBHz",
+      "value": 47
+    },
+    "elevationAdjust": false
+  }
+}

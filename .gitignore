@@ -1,0 +1,15 @@
+# Git / editors
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Large GNSS/SDR simulation data
+PocketSDR/conf/*.bin
+
+# Temporary files
+*.tmp
+*.log

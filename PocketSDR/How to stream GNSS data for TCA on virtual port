@@ -1,0 +1,29 @@
+How to open virtual port 5 to listen TCA stream?/
+Ans: Open new terminal and path to pocketSDR directory and run the command:
+python3 - <<'PY'
+import serial
+ser = serial.Serial('/dev/pts/5', 500000, timeout=1)
+print('Listening on /dev/pts/5...')
+while True:
+    line = ser.readline()
+    if line:
+        print(line.decode(errors='replace').rstrip())
+PY
+
+ Its output look like(istening on /dev/pts/5...)
+ 
+ 
+ How to open PocketSDR gui?
+ 
+ Ans: Open second terminal and Run the command:
+
+export POCKETSDR_TCA_PORT=/dev/pts/4
+export POCKETSDR_TCA_BAUDRATE=500000
+python3 python/pocket_sdr.py
+
+
+How to open virtual port ?
+
+Ans: Open the thirdf terminal and run the command :
+
+socat -d -d pty,raw,echo=0 pty,raw,echo=0

@@ -1,0 +1,9 @@
+ How to open and Run PocketSDR gui to transmit data for TCA on teensy?
+ 
+ Ans: Open terminal and Run the command:
+ 
+export POCKETSDR_TCA_PORT=/dev/ttyUSB0
+export POCKETSDR_TCA_BAUDRATE=500000
+export POCKETSDR_TCA_ENABLE=1
+python3 python/pocket_sdr.py
+
