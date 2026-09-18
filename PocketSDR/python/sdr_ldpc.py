@@ -43,7 +43,7 @@ try:
     libldpc = cdll.LoadLibrary(lib)
 except:
     print('libldpc load error: ' + lib)
-    exit(-1)
+    libldpc = None
 
 # constants --------------------------------------------------------------------
 MAX_ITER = 250

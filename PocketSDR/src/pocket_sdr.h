@@ -63,6 +63,7 @@ extern "C" {
 #define SDR_CSCALE    (1/11.2f) // carrier scale (max(IQ)*sqrt(2)/scale<=127)
 #define SDR_CYC        1e-3     // IF data processing cycle (s)
 #define PI 3.1415926535897932   // pi
+#define SDR_GLO_GPS_TOFF (10800.0 - 18.0) // GLONASS time (UTC+3h) - GPS time (UTC+18s)
 
 #define SDR_DEV_FILE   1        // SDR device: file
 #define SDR_DEV_USB    2        // SDR device: Pocket SDR FE

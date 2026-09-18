@@ -854,7 +854,7 @@ static void update_obs(gtime_t time, obs_t *obs, sdr_ch_t *ch)
         obs->data[i].rcv = idx == 0 ? ch->rf_ch + 1 : 0;
         obs->n++;
     }
-    obs->data[i].code[idx] = code;
+        obs->data[i].code[idx] = code; // Store signal code
     obs->data[i].P[idx] = P;
     obs->data[i].L[idx] = gen_cphas(ch, P);
     obs->data[i].D[idx] = (float)ch->fd;
@@ -989,7 +989,12 @@ void sdr_pvt_udnav(sdr_pvt_t *pvt, sdr_ch_t *ch)
         if (ch->nav->type == 4 && test_nav_glo(ch) &&
             decode_glostr(data, pvt->nav->geph + prn - 1, NULL, NULL)) {
             pvt->nav->geph[prn-1].sat = sat;
-            pvt->nav->geph[prn-1].frq = norm_glo_fcn(ch->prn); // FCN (normalized)
+            {
+                int fcn_norm = norm_glo_fcn(ch->prn);
+                pvt->nav->geph[prn-1].frq = fcn_norm; // normalized FCN
+                if (prn - 1 >= 0 && prn - 1 < (int)(sizeof(pvt->nav->glo_fcn)/sizeof(pvt->nav->glo_fcn[0])))
+                    pvt->nav->glo_fcn[prn-1] = fcn_norm + 8; /* fcn+8 as in RTKLIB */
+            }
             out_log_eph(ch->time, ch->sat, ch->sig, pvt->nav->geph + prn - 1);
             out_rtcm3_nav(pvt->rtcm, sat, 0, pvt->nav, pvt->rcv->strs[1]);
             pvt->count[2]++;
@@ -1158,12 +1163,21 @@ static int reject_unstable_pvt(sdr_pvt_t *pvt, const sol_t *sol, double time,
 
     if (sol->ns < SDR_PVT_MIN_NS) {
         snprintf(msg, msg_size, "rejected marginal PVT ns=%d", sol->ns);
+        sdr_log(3, "$LOG,%.3f,PVT REJECT,ns=%d", time, sol->ns);
+        /* emit per-satellite snapshot for diagnostics */
+        for (int i = 0; i < MAXSAT; i++) {
+            if (pvt && pvt->ssat[i].snr[0] > 0) out_log_sat(time, i + 1, sol, pvt->ssat + i);
+        }
         return 1;
     }
 
     ecef2pos(sol->rr,pos);
     if (fabs(pos[2]) > SDR_PVT_ALT_ABS_MAX_M) {
         snprintf(msg, msg_size, "rejected altitude %.1f m", pos[2]);
+        sdr_log(3, "$LOG,%.3f,PVT REJECT,alt=%.1f", time, pos[2]);
+        for (int i = 0; i < MAXSAT; i++) {
+            if (pvt && pvt->ssat[i].snr[0] > 0) out_log_sat(time, i + 1, sol, pvt->ssat + i);
+        }
         return 1;
     }
 
@@ -1185,6 +1199,10 @@ static int reject_unstable_pvt(sdr_pvt_t *pvt, const sol_t *sol, double time,
         snprintf(msg, msg_size,
             "rejected PVT jump H=%.1f/%.1f m V=%.1f/%.1f m dt=%.2f s",
             hstep,hgate,vstep,vgate,dt);
+        sdr_log(3, "$LOG,%.3f,PVT REJECT,%s", time, msg);
+        for (int i = 0; i < MAXSAT; i++) {
+            if (pvt && pvt->ssat[i].snr[0] > 0) out_log_sat(time, i + 1, sol, pvt->ssat + i);
+        }
         return 1;
     }
     return 0;
@@ -1487,12 +1505,44 @@ void sdr_pvt_udsol(sdr_pvt_t *pvt, int64_t ix)
 const char *sdr_rcv_tca_stat(sdr_rcv_t *rcv)
 {
     (void)rcv;
+    static char tca_copy[65536];
+    const char *src = NULL;
+
+    if (rcv && rcv->pvt) {
+        sdr_mutex_lock(&rcv->pvt->mtx);
+        src = pntpos_get_tca_csv();
+        if (src) {
+            strncpy(tca_copy, src, sizeof(tca_copy) - 1);
+            tca_copy[sizeof(tca_copy) - 1] = '\0';
+        }
+        else {
+            tca_copy[0] = '\0';
+        }
+        sdr_mutex_unlock(&rcv->pvt->mtx);
+        return tca_copy;
+    }
     return pntpos_get_tca_csv();
 }
 
 const char *sdr_pvt_tca_stat(sdr_pvt_t *pvt)
 {
     (void)pvt;
+    static char tca_copy[65536];
+    const char *src = NULL;
+
+    if (pvt) {
+        sdr_mutex_lock(&pvt->mtx);
+        src = pntpos_get_tca_csv();
+        if (src) {
+            strncpy(tca_copy, src, sizeof(tca_copy) - 1);
+            tca_copy[sizeof(tca_copy) - 1] = '\0';
+        }
+        else {
+            tca_copy[0] = '\0';
+        }
+        sdr_mutex_unlock(&pvt->mtx);
+        return tca_copy;
+    }
     return pntpos_get_tca_csv();
 }
 

@@ -1,0 +1,348 @@
+{
+  "version": 1.0,
+  "description": "SignalSim-compatible 300 s quasi-static pre-roll plus 387.385 s 200 Hz-aligned smooth hyperbola-like high-dynamics trajectory. The tiny non-zero initial speed preserves the requested SCU course through SignalSim's zero-speed direction handling. Repeated VerticalAcc segments refresh the local-up direction along the trajectory.",
+  "time": {
+    "type": "UTC",
+    "year": 2021,
+    "month": 6,
+    "day": 19,
+    "hour": 10,
+    "minute": 5,
+    "second": 30
+  },
+  "trajectory": {
+    "name": "SignalSim corrected hyperbola-like trajectory",
+    "initPosition": {
+      "type": "LLA",
+      "format": "d",
+      "longitude": -121.915773,
+      "latitude": 37.352721,
+      "altitude": 20.0
+    },
+    "initVelocity": {
+      "type": "SCU",
+      "speed": 0.0001,
+      "course": 0
+    },
+    "trajectoryList": [
+      {
+        "type": "Const",
+        "time": 300.0
+      },
+      {
+        "type": "ConstAcc",
+        "time": 5.2,
+        "acceleration": 349.8457180383451
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 5.82,
+        "acceleration": 178.59149194
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -1.305085754755
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -1.481666620056
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -1.688723413391
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -1.932310836502
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -2.219695143577
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -2.559514827107
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -2.961884799019
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -3.438366275491
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -4.001670486552
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -4.664887257799
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -5.439934459738
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -6.334840243257
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -7.349475800908
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -8.469610242824
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -9.659891813259
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -10.857738541858
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -11.971876357411
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -12.89018155591
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -13.499496115342
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.545,
+        "acceleration": -13.714028368712
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -13.499496115342
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -12.89018155591
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -11.971876357411
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -10.857738541858
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -9.659891813259
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -8.469610242824
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -7.349475800908
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -6.334840243257
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -5.439934459738
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -4.664887257799
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -4.001670486552
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -3.438366275491
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -2.961884799019
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -2.559514827107
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -2.219695143577
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -1.932310836502
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -1.688723413391
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -1.481666620056
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 9.5,
+        "acceleration": -1.305085754755
+      },
+      {
+        "type": "VerticalAcc",
+        "time": 5.82,
+        "acceleration": 178.81120406
+      }
+    ]
+  },
+  "ephemeris": {
+    "type": "RINEX",
+    "name": "../EphData/BRDC00IGS_R_20211700000_01D_MN.rnx"
+  },
+  "output": {
+    "type": "IFdata",
+    "format": "IQ16",
+    "sampleFreq": 4.1,
+    "centerFreq": 1575.42,
+    "name": "checkingtrajectory.bin",
+    "config": {
+      "elevationMask": 3
+    },
+    "systemSelect": [
+      {
+        "system": "GPS",
+        "signal": "L1CA",
+        "enable": true
+      },
+      {
+        "system": "GPS",
+        "signal": "L1C",
+        "enable": false
+      },
+      {
+        "system": "GPS",
+        "signal": "L2C",
+        "enable": false
+      },
+      {
+        "system": "GPS",
+        "signal": "L5",
+        "enable": false
+      },
+      {
+        "system": "BDS",
+        "signal": "B1C",
+        "enable": false
+      },
+      {
+        "system": "BDS",
+        "signal": "B1I",
+        "enable": false
+      },
+      {
+        "system": "BDS",
+        "signal": "B2a",
+        "enable": false
+      },
+      {
+        "system": "BDS",
+        "signal": "B2I",
+        "enable": false
+      },
+      {
+        "system": "BDS",
+        "signal": "B2b",
+        "enable": false
+      },
+      {
+        "system": "BDS",
+        "signal": "B3I",
+        "enable": false
+      },
+      {
+        "system": "Galileo",
+        "signal": "E1",
+        "enable": false
+      },
+      {
+        "system": "Galileo",
+        "signal": "E5a",
+        "enable": false
+      },
+      {
+        "system": "Galileo",
+        "signal": "E5b",
+        "enable": false
+      },
+      {
+        "system": "Galileo",
+        "signal": "E6",
+        "enable": false
+      },
+      {
+        "system": "GLONASS",
+        "signal": "G1",
+        "enable": false
+      },
+      {
+        "system": "GLONASS",
+        "signal": "G2",
+        "enable": false
+      }
+    ]
+  },
+  "power": {
+    "noiseFloor": -172,
+    "initPower": {
+      "unit": "dBHz",
+      "value": 47
+    },
+    "elevationAdjust": false
+  }
+}

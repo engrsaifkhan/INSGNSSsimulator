@@ -130,6 +130,16 @@ static void test_sdr_nav_decode_l1ca_symbol_sync(void)
     TEST_ASSERT_EQ_INT(0xAA, ch.nav->syms[SDR_MAX_NSYM-2]);
 }
 
+// test GLONASS-to-GPS TOW conversion ----------------------------------------
+static void test_sdr_nav_glo_tow_offset(void)
+{
+    double tod = 0.0;
+    double gpst = tod - SDR_GLO_GPS_TOFF;
+
+    TEST_ASSERT_NEAR(-10782.0, gpst, 1e-9);
+    TEST_ASSERT_NEAR(10782.0, SDR_GLO_GPS_TOFF, 1e-9);
+}
+
 // test sdr_nav_decode() G1CA (N=10) symbol sync -------------------------------
 static void test_sdr_nav_decode_g1ca_symbol_sync(void)
 {
@@ -317,6 +327,7 @@ int main(void)
     
     TEST_RUN(test_sdr_nav_new_free_init_api);
     TEST_RUN(test_crc_helpers);
+    TEST_RUN(test_sdr_nav_glo_tow_offset);
     TEST_RUN(test_sdr_nav_decode_l1ca_symbol_sync);
     TEST_RUN(test_sdr_nav_decode_g1ca_symbol_sync);
     TEST_RUN(test_sdr_nav_decode_sbas_symbol_sync);

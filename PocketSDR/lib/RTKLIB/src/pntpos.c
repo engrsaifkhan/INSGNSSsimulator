@@ -276,12 +276,17 @@ static double prange(const obsd_t *obs, const nav_t *nav, const prcopt_t *opt,
             gamma=SQR(FREQ1_GLO/FREQ2_GLO);
             return (P2-gamma*P1)/(1.0-gamma);
         }
-        else if (sys==SYS_GAL) { /* E1-E5b */
-            gamma=SQR(FREQ1/FREQ7);
-            if (getseleph(SYS_GAL)) { /* F/NAV */
-                P2-=gettgd(sat,nav,0)-gettgd(sat,nav,1); /* BGD_E5aE5b */
-            }
-            return (P2-gamma*P1)/(1.0-gamma);
+        else if (sys==SYS_GAL) { /* E1-E5b (Galileo): use explicit E5b frequency */
+            /* Use E1-E5b iono-free combination (E5b = FREQ7) */
+            gamma = SQR(FREQ1 / FREQ7);
+            /* Use available TGD entries: tgd[0]=BGD_E1E5a, tgd[1]=BGD_E1E5b for GAL
+               nav->eph[].tgd indices are system-dependent; keep existing TGD
+               handling but ensure E5b is used for the iono-free frequency ratio. */
+            if      (obs->code[0]==CODE_L2I) b1=gettgd(sat,nav,0); /* keep legacy mapping */
+            else if (obs->code[0]==CODE_L1P) b1=gettgd(sat,nav,2);
+            else b1=gettgd(sat,nav,2)+gettgd(sat,nav,4);
+            b2=gettgd(sat,nav,1); /* E1-E5b TGD (m) */
+            return ((P2-gamma*P1)-(b2-gamma*b1))/(1.0-gamma);
         }
         else if (sys==SYS_CMP) { /* B1-B2 */
             gamma=SQR(((obs->code[0]==CODE_L2I)?FREQ1_CMP:FREQ1)/FREQ2_CMP);
@@ -308,9 +313,10 @@ static double prange(const obsd_t *obs, const nav_t *nav, const prcopt_t *opt,
             b1=gettgd(sat,nav,0); /* -dtaun (m) */
             return P1-b1/(gamma-1.0);
         }
-        else if (sys==SYS_GAL) { /* E1 */
-            if (getseleph(SYS_GAL)) b1=gettgd(sat,nav,0); /* BGD_E1E5a */
-            else                    b1=gettgd(sat,nav,1); /* BGD_E1E5b */
+        else if (sys==SYS_GAL) { /* E1, treat like BeiDou B1I */
+            if      (obs->code[0]==CODE_L2I) b1=gettgd(sat,nav,0); /* TGD_B1I */
+            else if (obs->code[0]==CODE_L1P) b1=gettgd(sat,nav,2); /* TGD_B1Cp */
+            else b1=gettgd(sat,nav,2)+gettgd(sat,nav,4); /* TGD_B1Cp+ISC_B1Cd */
             return P1-b1;
         }
         else if (sys==SYS_CMP) { /* B1I/B1Cp/B1Cd */
@@ -732,8 +738,11 @@ static int resdop(const obsd_t *obs, int n, const double *rs, const double *dts,
             vs[j]=rs[j+3+i*6]-x[j];
         }
         /* range rate with earth rotation correction */
-        rate=dot(vs,e,3)+OMGE/CLIGHT*(rs[4+i*6]*rr[0]+rs[1+i*6]*x[0]-
-                                      rs[3+i*6]*rr[1]-rs[  i*6]*x[1]);
+        /* Use receiver ECEF position (`rr`) here — previous code used
+         * `x[]` (velocity state) by mistake which can corrupt velocity
+         * estimation and downstream TCA outputs. */
+        rate = dot(vs,e,3) + OMGE/CLIGHT*(rs[4+i*6]*rr[0] + rs[1+i*6]*rr[1]
+                         - rs[3+i*6]*rr[1] - rs[i*6]*rr[0]);
         
         /* Std of range rate error (m/s) */
         sig=(err<=0.0)?1.0:err*CLIGHT/freq;
@@ -852,20 +861,12 @@ static void export_tca_csv_from_pntpos(const obsd_t *obs, int n,
         /* Do not export unhealthy/excluded satellites. */
         if (satexclude(sat,vare[i],svh[i],opt)) continue;
 
-        /* select first valid pseudorange observation index (support
-         * NFREQ+NEXOBS mapping). Zero Doppler is still a valid measurement;
-         * only the range-rate term is zero in that case, not the pseudorange.
-         */
-        int idx0 = -1;
-        for (int k = 0; k < NFREQ + NEXOBS; k++) {
-            if (obs[i].code[k] && obs[i].P[k] > 0.0) {
-                idx0 = k; break;
-            }
-        }
-        if (idx0 < 0) continue;
+        if (obs[i].P[0]<=0.0) continue;
+        if (obs[i].D[0]==0.0) continue;
+        if (obs[i].code[0]==0) continue;
 
         if (norm(rs+i*6,3)<=0.0) continue;
-        if ((freq=sat2freq(sat,obs[i].code[idx0],nav))==0.0) continue;
+        if ((freq=sat2freq(sat,obs[i].code[0],nav))==0.0) continue;
 
         /* Geometry and az/el from reference receiver position. */
         if ((r=geodist(rs+i*6,rr_ref,e))<=0.0) continue;
@@ -887,38 +888,25 @@ static void export_tca_csv_from_pntpos(const obsd_t *obs, int n,
         /* Same RTKLIB SNR mask logic used by pntpos(). */
         if (!snrmask(obs+i,azel_i,opt)) continue;
 
-        cn0=obs[i].SNR[idx0]*SNR_UNIT;
+        cn0=obs[i].SNR[0]*SNR_UNIT;
         if (cn0<TCA_CN0_MIN) continue;
 
         /* prange() applies TGD/BGD/DCB/code-bias correction. */
-        /* prange() expects obs with code/P at primary index 0; create a
-         * temporary copy with selected index swapped to 0 for prange(). */
-        obsd_t obs_tmp = obs[i];
-        if (idx0 != 0) {
-            /* swap selected index to 0 */
-            uint8_t code_tmp = obs_tmp.code[0]; double P_tmp = obs_tmp.P[0];
-            double L_tmp = obs_tmp.L[0]; float D_tmp = obs_tmp.D[0];
-            uint16_t SNR_tmp = obs_tmp.SNR[0];
-            obs_tmp.code[0] = obs_tmp.code[idx0]; obs_tmp.P[0] = obs_tmp.P[idx0];
-            obs_tmp.L[0] = obs_tmp.L[idx0]; obs_tmp.D[0] = obs_tmp.D[idx0];
-            obs_tmp.SNR[0] = obs_tmp.SNR[idx0];
-            /* keep other indices unchanged */
-        }
-        if ((P_prange=prange(&obs_tmp,nav,opt,&vmeas))==0.0) continue;
+        if ((P_prange=prange(obs+i,nav,opt,&vmeas))==0.0) continue;
 
         /* receiver antenna phase center correction */
         antmodel(opt->pcvr,opt->antdel[0],azel_i,opt->posopt[1],dant);
-        idx = code2idx(sys, obs_tmp.code[0]);
+        idx = code2idx(sys, obs[i].code[0]);
 
         /* Ionospheric correction. */
-        if (!ionocorr(obs_tmp.time,nav,sat,pos,azel_i,opt->ionoopt,
+        if (!ionocorr(obs[i].time,nav,sat,pos,azel_i,opt->ionoopt,
                       &dion,&vion)) {
             continue;
         }
         dion*=SQR(FREQ1/freq);
 
         /* Tropospheric correction. */
-        if (!tropcorr(obs_tmp.time,nav,pos,azel_i,opt->tropopt,
+        if (!tropcorr(obs[i].time,nav,pos,azel_i,opt->tropopt,
                       &dtrp,&vtrp)) {
             continue;
         }
@@ -938,15 +926,8 @@ static void export_tca_csv_from_pntpos(const obsd_t *obs, int n,
         /* Do not apply Sagnac-rate correction here. Satellite clock drift is
          * still compensated; receiver clock drift remains for Teensy to estimate.
          */
-        prrate_corr = -obs_tmp.D[0]*CLIGHT/freq + CLIGHT*dts[i*2+1];
-        sig_name = tca_signal_name(sys,obs_tmp.code[0]);
-
-        /* Debug: dump compensation components for verification */
-        trace(2,
-            "TCA_DBG sat=%2d code=%s P_prange=%.6f P_obs=%.6f CLIGHT*dts=%.9f dion=%.6f dtrp=%.6f sys_bias=%.6f pr_corr=%.6f dop_term=%.6f CLIGHT*dts_drift=%.9f prrate_corr=%.6f freq=%.3f\n",
-            sat, code2obs(obs_tmp.code[0]), P_prange, obs_tmp.P[0], CLIGHT*dts[i*2],
-            dion, dtrp, sys_bias, pr_corr, -obs_tmp.D[0]*CLIGHT/freq,
-            CLIGHT*dts[i*2+1], prrate_corr, freq);
+        prrate_corr = -obs[i].D[0]*CLIGHT/freq + CLIGHT*dts[i*2+1];
+        sig_name = tca_signal_name(sys,obs[i].code[0]);
 
         tca_buff_append(tca_rows_buff,&tca_rows_len,
             "%.6f,%.9f,"

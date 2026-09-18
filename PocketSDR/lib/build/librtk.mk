@@ -22,9 +22,9 @@ else
 endif
 
 INCLUDE= -I$(SRC)
-WARNOPTS = -pedantic -Wall -Wno-unused-but-set-variable -Wno-unused-function -Wno-unused-const-variable
+WARNOPTS = -ansi -pedantic -Wall -Wno-unused-but-set-variable -Wno-unused-function -Wno-unused-const-variable
 
-CFLAGS = -std=c99 -O3 $(INCLUDE) $(OPTIONS) $(WARNOPTS) -fPIC -g
+CFLAGS = -O3 $(INCLUDE) $(OPTIONS) $(WARNOPTS) -fPIC -g
 
 OBJ = rtkcmn.o tides.o rtkpos.o geoid.o solution.o lambda.o sbas.o \
       stream.o rcvraw.o rtcm.o rtcm2.o rtcm3.o rtcm3e.o preceph.o options.o \

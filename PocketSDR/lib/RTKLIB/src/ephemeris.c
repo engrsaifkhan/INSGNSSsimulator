@@ -185,6 +185,10 @@ extern void alm2pos(gtime_t time, const alm_t *alm, double *rs, double *dts)
 }
 /* glonass almanac to satellite position and clock bias ------------------------
 * compute satellite position and clock bias with glonass almanac (ref [2] 4.5)
+* NOTE: The function name `galm2pos()` historically reads like "Galileo
+* almanac to position", but in RTKLIB "galm" here refers to GLONASS
+* almanac processing (GLO). This comment clarifies that `galm2pos()` is the
+* GLONASS almanac routine to avoid confusion with Galileo-related functions.
 * args   : gtime_t time     I   time (gpst)
 *          alm_t  *alm      I   almanac (glo.* fields used)
 *          double *rs       O   satellite position (ecef) {x,y,z} (m)

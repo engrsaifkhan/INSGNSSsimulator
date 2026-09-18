@@ -1,0 +1,4 @@
+3 init_rtcm:
+3 loadnav: file=.pocket_navdata.csv
+3 savenav: file=.pocket_navdata.csv
+3 free_rtcm:

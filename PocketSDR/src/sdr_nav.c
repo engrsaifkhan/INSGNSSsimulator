@@ -77,6 +77,7 @@
 #define GPST_IRT_W  1024      // GPST - IRT (week)
 #define GPST_BDT    14.0      // GPST - BDT (s)
 #define GPST_UTC    18.0      // GPST - UTC (s) (2017-1-1 ~ )
+#define GLO_GPS_TOFF (SDR_GLO_GPS_TOFF) // GLONASS time (UTC+3h) - GPST (s)
 #define TOFF_L1CA   0.160     // time offset (s) L1CA
 #define TOFF_L1CA_S 1.020     // time offset (s) L1CA SBAS
 #define TOFF_L1CD  18.520     // time offset (s) L1CD
@@ -1068,7 +1069,7 @@ static void decode_glo_str(sdr_ch_t *ch, const uint8_t *syms, int rev)
         if (sno == 1) {
             double tod = getbitu(data, 9, 5) * 3600.0 +
                 getbitu(data, 14, 6) * 60.0 + getbitu(data, 20, 1) * 30.0;
-            update_tow(ch, tod + TOFF_G1CA + GPST_UTC);
+            update_tow(ch, tod + TOFF_G1CA - GLO_GPS_TOFF);
             ch->tow_v = 2;
         }
         ch->nav->type = sno; // GLO string number
@@ -1137,7 +1138,7 @@ static void decode_glo_L1OCD_str(sdr_ch_t *ch, const uint8_t *bits, int rev)
         ch->nav->fsync = ch->lock;
         ch->nav->rev = rev;
         sdr_pack_bits(buff, 250, 0, data);
-        update_tow(ch, getbitu(data, 34, 16) * 2.0 + TOFF_G1OCD + GPST_UTC);
+        update_tow(ch, getbitu(data, 34, 16) * 2.0 + TOFF_G1OCD - GLO_GPS_TOFF);
         ch->tow_v = 2;
         ch->nav->type = getbitu(data, 12, 6); // L1OCD nav string type
         memcpy(ch->nav->data, data, 32); // L1OCD nav string (250 bits)
@@ -1209,7 +1210,7 @@ static void decode_glo_L3OCD_str(sdr_ch_t *ch, const uint8_t *bits, int rev)
         ch->nav->ssync = ch->nav->fsync = ch->lock;
         ch->nav->rev = rev;
         sdr_pack_bits(buff, 300, 0, data);
-        update_tow(ch, getbitu(data, 26, 15) * 3.0 + TOFF_G3OCD + GPST_UTC);
+        update_tow(ch, getbitu(data, 26, 15) * 3.0 + TOFF_G3OCD - GLO_GPS_TOFF);
         ch->tow_v = 2;
         ch->nav->type = getbitu(data, 20, 6); // GLO L3OCD nav string type
         memcpy(ch->nav->data, data, 38); // GLO L3OCD nav string (300 bits)

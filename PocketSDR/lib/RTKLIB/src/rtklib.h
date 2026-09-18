@@ -1822,6 +1822,7 @@ extern double ionmodel_nav(gtime_t time, nav_t *nav, const double *pos,
 extern eph_t *navgeteph(nav_t *nav, int idx);
 extern geph_t *navgetgeph(nav_t *nav, int idx);
 extern double navgettgd(int sat, const nav_t *nav);
+extern double navgettgd_type(int sat, const nav_t *nav, int type);
 extern stream_t *strnew(void);
 extern void strfree(stream_t *str);
 

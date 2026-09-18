@@ -114,6 +114,21 @@ double navgettgd(int sat, const nav_t *nav)
     return 0.0;
 }
 
+/* get TGD for specific type index -----------------------------------------*/
+double navgettgd_type(int sat, const nav_t *nav, int type)
+{
+    int i;
+    if (!nav) return 0.0;
+    /* GLONASS handled in gettgd(); here we return requested tgd[type] (m) */
+    for (i = 0; i < nav->n; i++) {
+        if (nav->eph[i].sat == sat) {
+            if (type >= 0 && type < 6) return CLIGHT * nav->eph[i].tgd[type];
+            return CLIGHT * nav->eph[i].tgd[0];
+        }
+    }
+    return 0.0;
+}
+
 /* new stream ----------------------------------------------------------------*/
 stream_t *strnew(void)
 {

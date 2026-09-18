@@ -70,7 +70,7 @@ else
 endif
 
 #CFLAGS = -O3 -march=native $(INCLUDE) $(OPTIONS) -Wall -fPIC -g
-CFLAGS = -std=c99 -O3 $(INCLUDE) $(OPTIONS) -Wall -fPIC -g
+CFLAGS = -O3 $(INCLUDE) $(OPTIONS) -Wall -fPIC -g
 
 OBJ = sdr_cmn.o sdr_func.o sdr_code.o sdr_code_gal.o sdr_ch.o \
       sdr_nav.o sdr_pvt.o sdr_rcv.o sdr_fec.o sdr_ldpc.o sdr_nb_ldpc.o \

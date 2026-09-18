@@ -34,7 +34,7 @@ try:
     libfec = cdll.LoadLibrary(lib)
 except:
     print('load libfec error: ' + lib)
-    exit(-1)
+    libfec = None
 
 #-------------------------------------------------------------------------------
 #  Encode convolution code (K=7, R=1/2, Poly=G1:0x4F,G2:0x6D).
@@ -79,6 +79,9 @@ def decode_conv(data):
         print('decode_conv: data length or type error')
         return NONE
     
+    if libfec is None:
+        print('decode_conv: libfec not available')
+        return NONE
     # initialize Viterbi decoder
     libfec.create_viterbi27.restype = c_void_p
     dec = libfec.create_viterbi27(N)
@@ -132,6 +135,9 @@ def encode_rs(syms):
     p = syms.ctypes.data_as(POINTER(c_uint8))
     q = parity.ctypes.data_as(POINTER(c_uint8))
     
+    if libfec is None:
+        print('encode_rs: libfec not available')
+        return
     # encode RS-CCSDS
     libfec.encode_rs_ccsds(p, q, 0)
     
@@ -154,6 +160,9 @@ def decode_rs(syms):
     
     p = syms.ctypes.data_as(POINTER(c_uint8))
     
+    if libfec is None:
+        print('decode_rs: libfec not available')
+        return -1
     # decode RS-CCSDS
     return libfec.decode_rs_ccsds(p, None, 0, 0)
 
