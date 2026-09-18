@@ -43,7 +43,7 @@
 extern "C" {
 #endif
 
-// constants and macros ------------------------------------------------------
+// constant and macro ------------------------------------------------------
 #define SDR_LIB_NAME   "Pocket SDR" // library name
 #define SDR_LIB_VER    "0.18"   // library version
 #define SDR_MAX_RFCH   8        // max number of RF channels
